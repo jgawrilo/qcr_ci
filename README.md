@@ -8,4 +8,9 @@ cd qcr_ci
 
 docker build -t qcr-causal-impact .
 docker run -p 5001:5001 qcr-causal-impact
+
+# Can test with...
+./test_api.sh
+
+# this will run a simple causal impact test and display the output returned
 ```
