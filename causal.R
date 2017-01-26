@@ -1,50 +1,52 @@
 #!/usr/bin/env Rscript
-#install.packages(c("devtools"), repos="http://cran.us.r-project.org", dependencies=TRUE)
-library(devtools)
-#devtools::install_github("google/CausalImpact")
-library(CausalImpact)
 
-#anyNA <- function(x) any(is.na(x))
-#library("ggplot2")
+library(devtools)
+library(CausalImpact)
 
 args = commandArgs(trailingOnly=TRUE)
 
-x <- args[1]
-#output_path <- args[2]
+data_file <- args[1]
 pre_period_start <- args[2]
 pre_period_end <- args[3]
 post_period_start <- args[4]
 post_period_end <- args[5]
 
-ts_data <- read.csv(file=x,head=TRUE,sep=",")
+# Read in data, separated by ,
+ts_data <- read.csv(file=data_file,head=TRUE,sep=",")
+
+# Dates should be YYYY-MM-DD. May need to revisit for hour...
 ts_data$date <- as.Date(ts_data$date, format="%Y-%m-%d")
+
+# Set NAs to 0
 ts_data[is.na(ts_data)] <- 0
 
+# Set pre and post periods
 pre.period <- as.Date(c(pre_period_start, pre_period_end))
 post.period <- as.Date(c(post_period_start, post_period_end))
 
-anger <- "emotion.anger"
-angry <- "emotion.angry"
-fear <- "emotion.fear"
+### IMPORTANT -- HARDCODED FOR NOW
+### Will figure this out later...
 
-# Raw ISIS Counts
-#data <- zoo(cbind(ts_data$target_isis_perc, ts_data$isis_perc), ts_data$date)
-data <- zoo(cbind(ts_data[anger], ts_data[angry], ts_data[fear]), ts_data$date)
+emotion.sadness <- "emotion.sadness"
+target.emotion.sadness <- "target.emotion.sadness"
 
-impact <- CausalImpact(data, pre.period, post.period)
+# Join up data...first is Y and remaining are x1, x2, x3...
+impact_input <- zoo(cbind(ts_data[target.emotion.sadness], ts_data[emotion.sadness]), ts_data$date)
+
+# Do the magic
+impact_output <- CausalImpact(impact_input, pre.period, post.period)
+
+# THIS NEEDS TO BE WIDE ENOUGH FOR OUTPUT!!!
 options(width=1000)
 
-#print()
-#mypath <- paste(output_path,"guy_isis.png", sep="")
-#fileConn<-file(paste(output_path,"datas/","guy_isis.txt",sep=""))
-#writeLines(paste("guy",impact$summary$AbsEffect[2]), fileConn)
-#close(fileConn)
+# Both of these are picked up by python process as the outputs
+cat(paste(impact_output$summary$AbsEffect[2],"\n"))
+print(impact_output$series)
 
-cat(paste(impact$summary$AbsEffect[2],"\n"))
-print(impact$series)
-
-#png(mypath)
-#    plot(impact)
-#dev.off()
+# Let's save the charts for now as well
+mypath <- paste("/src/image_outputs/","emotion.png", sep="")
+png(mypath)
+    plot(impact_output)
+dev.off()
 
 
