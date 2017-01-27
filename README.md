@@ -27,3 +27,5 @@ docker run -p 5001:5001 qcr-causal-impact
 
 # 
 ```
+
+![alt text](https://github.com/jgawrilo/qcr_ci/blob/master/image_outputs/sadness.png "Sadness plotted with CI")
