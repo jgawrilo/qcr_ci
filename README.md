@@ -27,6 +27,9 @@ docker run -p 5001:5001 qcr-causal-impact
 
 # 
 ```
+So input is
+
+![alt text](https://github.com/jgawrilo/qcr_ci/blob/master/imgs/Sadness_Time_Series.png "Sadness inputs")
 ```
 Output will be
 
