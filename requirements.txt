@@ -6,3 +6,4 @@ numpy
 pandas
 simplejson
 argparse
+rpy2
