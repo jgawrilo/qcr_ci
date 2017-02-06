@@ -1,5 +1,8 @@
 # qcr_ci
 Casual Impact Integration
+
+This project essentially wraps the Google Causal Imnpact package (https://google.github.io/CausalImpact/CausalImpact.html).
+
 ```bash
 # Get the repo...
 git clone https://github.com/jgawrilo/qcr_ci.git
@@ -7,8 +10,7 @@ git clone https://github.com/jgawrilo/qcr_ci.git
 # Go into the dir...
 cd qcr_ci
 
-# You must edit the config.json file to change the ES instance  You must have access to an ES which this container can pull data from.
-# Default uses the dev ES instance, index and, service port
+# You must edit the config.json file to change the docker service port
 
 # Build the container
 docker build -t qcr-causal-impact .
@@ -17,13 +19,11 @@ docker build -t qcr-causal-impact .
 docker run -p 5001:5001 qcr-causal-impact
 
 # Can test with the following.
-# this uses a target pouplation as tweets with benghazi hashtag and the full campaign as the control
-# the desired metric is emotion - specifically with the sadness band, so output is the casual impact of some event
-# on the sadness in bengnazi tagged tweets.
+# this uses the test_input.json as input
 
-./test_api.sh
+python test_service.py
 
-# this will run a simple causal impact test and display the output returned..see test_output.txt for details.
+# this will run a simple causal impact test and display the output returned..see test_output.json for details.
 
 # 
 ```
@@ -32,25 +32,47 @@ So input is...
 ![alt text](https://github.com/jgawrilo/qcr_ci/blob/master/imgs/Sadness_Time_Series.png "Sadness inputs")
 
 Output is...
-```
-
-{"total_impact": "302.919285529977", # cumulative impact at the end of the post period
-"ts_results": {"2016-10-03": # time period for results
-{"response": "2", # Actual response - solid line in original
-"point.effect.lower": -21.6999,  # Point-wise impact  - lower bound - lower blue line in pointwise
-"cum.response": 114.0, # Can ignore
-"cum.pred.lower": 114.0, # Can ignore
-"cum.effect": 0.0, # Cumulative Point-wise impact  - dotted line in cumulative
-"point.pred": 7.749572, # Predicted response - dotted line in original
-"cum.pred": 114.0, # Can ignore
-"cum.effect.upper": 0.0, # Cumulative Point-wise impact  - upper bound - upper blue line in cumulative
-"cum.effect.lower": 0.0, # Cumulative Point-wise impact  - lower bound - lower blue line in cumulative
-"point.pred.lower": -9.305632, # Predicted reponse - upper bound - blue upper region in original
-"point.pred.upper": 23.6999, # Predicted reponse - lower bound - lower upper region in original
-"point.effect.upper": 11.305632, # Point-wise impact  - upper bound - upper blue line in pointwise
-"point.effect": -5.74957167, # Point-wise impact  - dotted line in pointwise
-"cum.pred.upper": 114.0},# Can ignore
-{"2016-10-04":{...
+`{
+  "total_impact": 3700.23134190327, 
+  "ts_results": [
+    {
+      "cum.effect.upper": 0.0, 
+      "control": 4035, 
+      "point.effect": -3.908289, 
+      "point.effect.upper": 867.586, 
+      "target": 141, 
+      "cum.pred.upper": 141.0, 
+      "point.effect.lower": -904.61133, 
+      "point.pred.lower": -726.58602, 
+      "date": 1468281600, 
+      "cum.effect.lower": 0.0, 
+      "cum.pred": 141.0, 
+      "point.pred.upper": 1045.6113, 
+      "cum.response": 141, 
+      "cum.effect": 0.0, 
+      "point.pred": 144.90829, 
+      "response": 141, 
+      "cum.pred.lower": 141.0
+    }, 
+    {
+      "cum.effect.upper": 0.0, 
+      "control": 2860, 
+      "point.effect": -58.197883, 
+      "point.effect.upper": 926.1226, 
+      "target": 52, 
+      "cum.pred.upper": 193.0, 
+      "point.effect.lower": -985.821982, 
+      "point.pred.lower": -874.12263, 
+      "date": 1468368000, 
+      "cum.effect.lower": 0.0, 
+      "cum.pred": 193.0, 
+      "point.pred.upper": 1037.822, 
+      "cum.response": 193, 
+      "cum.effect": 0.0, 
+      "point.pred": 110.19788, 
+      "response": 52, 
+      "cum.pred.lower": 193.0
+    }, 
 ```
 
 ![alt text](https://github.com/jgawrilo/qcr_ci/blob/master/image_outputs/sadness.png "Sadness plotted with CI")
