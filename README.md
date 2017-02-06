@@ -27,11 +27,12 @@ docker run -p 5001:5001 qcr-causal-impact
 
 # 
 ```
-So input is
+So input is...
 
 ![alt text](https://github.com/jgawrilo/qcr_ci/blob/master/imgs/Sadness_Time_Series.png "Sadness inputs")
+
+Output is...
 ```
-Output will be
 
 {"total_impact": "302.919285529977", # cumulative impact at the end of the post period
 "ts_results": {"2016-10-03": # time period for results
