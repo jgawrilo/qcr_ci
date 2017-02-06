@@ -32,7 +32,8 @@ So input is...
 ![alt text](https://github.com/jgawrilo/qcr_ci/blob/master/imgs/Sadness_Time_Series.png "Sadness inputs")
 
 Output is...
-`{
+```
+{
   "total_impact": 3700.23134190327, 
   "ts_results": [
     {
