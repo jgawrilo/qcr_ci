@@ -9,4 +9,4 @@ url = "http://localhost:5001/api/impact"
 
 response = requests.post(url,data=json.dumps({"data":data}),headers=headers)
 
-print response.json()
+print json.dumps(response.json(),indent=2)
