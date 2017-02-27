@@ -126,6 +126,10 @@ class ImpactPredictorAPI(Resource):
         dout.index = range(1,len(dout)+1)
 
         final = pd.concat([time_df,dout],axis=1)
+        final.drop('cum.response', axis=1, inplace=True)
+        final.drop('cum.pred.lower', axis=1, inplace=True)
+        final.drop('cum.pred.upper', axis=1, inplace=True)
+        final.drop('cum.pred', axis=1, inplace=True)
 
         impact = dollar(dollar(py_out,"summary"),"AbsEffect")[1]
         #treatment_control_data["string_date"] = treatment_control_data.apply(
@@ -152,6 +156,8 @@ class ImpactPredictorAPI(Resource):
         # Turn into json
         ts_results = final.to_json(orient='records')
         ret_results = {"ts_results":json.loads(ts_results),"total_impact":impact}
+        with open('data/' + datetime.datetime.now().isoformat().replace(':','_'),'w') as out:
+            out.write(json.dumps(ret_results,indent=2))
         return ret_results
 
 '''
