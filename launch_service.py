@@ -4,6 +4,7 @@ from rpy2.robjects import r
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
+from rpy2.rinterface import RRuntimeError
 
 import argparse
 import logging
@@ -44,121 +45,85 @@ class ImpactPredictorAPI(Resource):
 
         super(ImpactPredictorAPI, self).__init__()
 
-    def runR_CausalImpact(self,treatment_control_data,
-        data_location,pre_period_start,pre_period_end,post_period_start,post_period_end):
-        # Run R process and captured printed output
-        r_output = subprocess.check_output(["Rscript", "causal.R", 
-            data_location,
-            pre_period_start,
-            pre_period_end,
-            post_period_start,
-            post_period_end], 
-            universal_newlines=True)
-
-        returned_data = StringIO(r_output)
-
-        # First line is cumulative impact number
-        cumulative_impact = returned_data.readline().strip()
-
-        # Remainder is the timeseries prediction data
-        time_series_data = pd.read_csv(returned_data,sep='\s+')
-
-        time_series_data.index.name = "string_date"
-
-        orig = pd.concat([time_series_data,treatment_control_data],axis=1)
-
-        orig = orig.set_index("date")
-
-        orig.index = orig.index.map(int)
-
-        orig["date"] = orig.index
-
-        return float(cumulative_impact), orig
-
     def post(self):
         
-        # Create filename for tmp file.  Will this work ok?
+        try:
 
-        args = self.reqparse.parse_args()
+            args = self.reqparse.parse_args()
 
-        treatment_control_data = pd.DataFrame.from_dict(args["data"]["series"])
+            treatment_control_data = pd.DataFrame.from_dict(args["data"]["series"])
 
-        time_df = treatment_control_data[["date"]]
+            time_df = treatment_control_data[["date"]]
 
-        time_df.index = range(1,len(time_df)+1)
+            time_df.index = range(1,len(time_df)+1)
 
-        treatment_control_data = treatment_control_data[["target","control"]]
+            logger.info("PRE-START:" +str(args["data"]["pre_start"]))
+            logger.info("PRE-END:" +str(args["data"]["pre_end"]))
+            logger.info("POST-START:" +str(args["data"]["post_start"]))
+            logger.info("POST-END:" +str(args["data"]["post_end"]))
+            logger.info("DATA:"+json.dumps(args["data"]["series"]))
 
-        treatment_control_data.index = range(1,len(treatment_control_data)+1)
+            treatment_control_data = treatment_control_data[["target","control"]]
 
-        pre_start = time_df[time_df.date == args["data"]["pre_start"]].index[0]
-        pre_end = time_df[time_df.date == args["data"]["pre_end"]].index[0]
-        post_start = time_df[time_df.date == args["data"]["post_start"]].index[0]
-        post_end = time_df[time_df.date == args["data"]["post_end"]].index[0]
+            treatment_control_data.index = range(1,len(treatment_control_data)+1)
 
-        columns = [
-            "response",
-            "cum.response",
-            "point.pred",
-            "point.pred.lower",
-            "point.pred.upper",
-            "cum.pred",
-            "cum.pred.lower",
-            "cum.pred.upper",
-            "point.effect",
-            "point.effect.lower",
-            "point.effect.upper",
-            "cum.effect",
-            "cum.effect.lower",
-            "cum.effect.upper"
-            ]
+            pre_start = time_df[time_df.date == args["data"]["pre_start"]].index[0]
+            pre_end = time_df[time_df.date == args["data"]["pre_end"]].index[0]
+            post_start = time_df[time_df.date == args["data"]["post_start"]].index[0]
+            post_end = time_df[time_df.date == args["data"]["post_end"]].index[0]
 
-        r_data = pandas2ri.py2ri(treatment_control_data)
-        pre = robjects.IntVector((pre_start,pre_end))
-        post = robjects.IntVector((post_start,post_end))
-        results = ci.CausalImpact(r_data,pre,post)
-        py_out = pandas2ri.ri2py(results)
+            columns = [
+                "response",
+                "cum.response",
+                "point.pred",
+                "point.pred.lower",
+                "point.pred.upper",
+                "cum.pred",
+                "cum.pred.lower",
+                "cum.pred.upper",
+                "point.effect",
+                "point.effect.lower",
+                "point.effect.upper",
+                "cum.effect",
+                "cum.effect.lower",
+                "cum.effect.upper"
+                ]
 
-        dout = pandas2ri.ri2py_dataframe(dollar(py_out,"series"))
+            r_data = pandas2ri.py2ri(treatment_control_data)
+            pre = robjects.IntVector((pre_start,pre_end))
+            post = robjects.IntVector((post_start,post_end))
 
-        dout.columns = columns
+            results = ci.CausalImpact(r_data,pre,post)
 
-        dout.index = range(1,len(dout)+1)
+            py_out = pandas2ri.ri2py(results)
 
-        final = pd.concat([time_df,dout],axis=1)
-        final.drop('cum.response', axis=1, inplace=True)
-        final.drop('cum.pred.lower', axis=1, inplace=True)
-        final.drop('cum.pred.upper', axis=1, inplace=True)
-        final.drop('cum.pred', axis=1, inplace=True)
+            dout = pandas2ri.ri2py_dataframe(dollar(py_out,"series"))
 
-        impact = dollar(dollar(py_out,"summary"),"AbsEffect")[1]
-        #treatment_control_data["string_date"] = treatment_control_data.apply(
-        #    lambda x: datetime.datetime.fromtimestamp(x['date']).isoformat().split("T")[0], axis=1)
-        #treatment_control_data = treatment_control_data.set_index("string_date")
+            dout.columns = columns
 
-        #tmp_filename = "./tmp/" + datetime.datetime.now().isoformat().replace(":","_") + ".txt"
+            dout.index = range(1,len(dout)+1)
 
-        # Save file to disk
-        #treatment_control_data.to_csv(tmp_filename ,sep=",",index_label="string_date",na_rep="0")
+            final = pd.concat([time_df,dout],axis=1)
+            final.drop('cum.response', axis=1, inplace=True)
+            final.drop('cum.pred.lower', axis=1, inplace=True)
+            final.drop('cum.pred.upper', axis=1, inplace=True)
+            final.drop('cum.pred', axis=1, inplace=True)
 
-        # Finally run R Causal Impact
+            impact = dollar(dollar(py_out,"summary"),"AbsEffect")[1]
+
+            # Turn into json
+            ts_results = final.to_json(orient='records')
+            ret_results = {"ts_results":json.loads(ts_results),"total_impact":impact}
+            with open('data/' + datetime.datetime.now().isoformat().replace(':','_'),'w') as out:
+                out.write(json.dumps(ret_results,indent=2))
+            return ret_results
         
-        #impact, casual_impact_data = self.runR_CausalImpact(treatment_control_data,tmp_filename,
-        #    datetime.datetime.fromtimestamp(args["data"]["pre_start"]).isoformat(),
-        #    datetime.datetime.fromtimestamp(args["data"]["pre_end"]).isoformat(),
-        #    datetime.datetime.fromtimestamp(args["data"]["post_start"]).isoformat(),
-        #    datetime.datetime.fromtimestamp(args["data"]["post_end"]).isoformat()
-        #)
-        
-        # Remove tmp file.  Comment out if debugging
-        #os.remove(tmp_filename)
+        except RRuntimeError as e:
+            return {"message":str(e)}
 
-        # Turn into json
-        ts_results = final.to_json(orient='records')
-        ret_results = {"ts_results":json.loads(ts_results),"total_impact":impact}
-        with open('data/' + datetime.datetime.now().isoformat().replace(':','_'),'w') as out:
-            out.write(json.dumps(ret_results,indent=2))
-        return ret_results
+        except Exception as e:
+            logger.error(e)
+            raise e
 
 '''
 Deal with these later
@@ -177,7 +142,6 @@ def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 # Start
-
 if __name__ == '__main__':
     logger.info('Starting Causal Impact Service.')
 
