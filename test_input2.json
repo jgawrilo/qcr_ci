@@ -1,0 +1,164 @@
+{
+    "pre_start": 1480550400,
+    "pre_end": 1482105600,
+    "post_start": 1482192000,
+    "post_end": 1483142400,
+    "interval": "daily",
+    "series": [
+      {
+        "date": 1480550400,
+        "treatment": 0,
+        "control": 2
+      },
+      {
+        "date": 1480636800,
+        "treatment": 1,
+        "control": 1
+      },
+      {
+        "date": 1480723200,
+        "treatment": 7,
+        "control": 3
+      },
+      {
+        "date": 1480809600,
+        "treatment": 2,
+        "control": 8
+      },
+      {
+        "date": 1480896000,
+        "treatment": 8,
+        "control": 10
+      },
+      {
+        "date": 1480982400,
+        "treatment": 9,
+        "control": 12
+      },
+      {
+        "date": 1481068800,
+        "treatment": 14,
+        "control": 17
+      },
+      {
+        "date": 1481155200,
+        "treatment": 20,
+        "control": 16
+      },
+      {
+        "date": 1481241600,
+        "treatment": 20,
+        "control": 18
+      },
+      {
+        "date": 1481328000,
+        "treatment": 20,
+        "control": 27
+      },
+      {
+        "date": 1481414400,
+        "treatment": 16,
+        "control": 17
+      },
+      {
+        "date": 1481500800,
+        "treatment": 22,
+        "control": 16
+      },
+      {
+        "date": 1481587200,
+        "treatment": 19,
+        "control": 9
+      },
+      {
+        "date": 1481673600,
+        "treatment": 8,
+        "control": 7
+      },
+      {
+        "date": 1481760000,
+        "treatment": 4,
+        "control": 1
+      },
+      {
+        "date": 1481846400,
+        "treatment": 5,
+        "control": 7
+      },
+      {
+        "date": 1481932800,
+        "treatment": 3,
+        "control": 2
+      },
+      {
+        "date": 1482019200,
+        "treatment": 0,
+        "control": 1
+      },
+      {
+        "date": 1482105600,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482192000,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482278400,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482364800,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482451200,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482537600,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482624000,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482710400,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482796800,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482883200,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1482969600,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1483056000,
+        "treatment": 0,
+        "control": 0
+      },
+      {
+        "date": 1483142400,
+        "treatment": 0,
+        "control": 0
+      }
+    ]
+  }

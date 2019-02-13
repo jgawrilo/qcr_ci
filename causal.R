@@ -26,7 +26,7 @@ post.period <- as.Date(c(post_period_start, post_period_end))
 
 
 # Join up data...first is Y and remaining are x1, x2, x3...
-impact_input <- zoo(cbind(ts_data$target, ts_data$control), ts_data$string_date)
+impact_input <- zoo(cbind(ts_data$treatment, ts_data$control), ts_data$string_date)
 
 # Do the magic
 impact_output <- CausalImpact(impact_input, pre.period, post.period)

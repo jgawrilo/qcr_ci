@@ -1,4 +1,15 @@
-FROM sd2k/rpy2-causalimpact-test
+FROM rpy2/rpy2:2.8.x
+
+MAINTAINER Justin Gawrilow 
+
+USER root
+
+RUN apt-get update && apt-get install -y libssl-dev libcurl4-openssl-dev
+
+RUN R -e 'install.packages("devtools", repos="http://cran.cnr.Berkeley.edu")'
+RUN R -e 'install.packages("Boom", repos="http://cran.cnr.Berkeley.edu")'
+RUN R -e 'install.packages("BoomSpikeSlab", repos="http://cran.cnr.Berkeley.edu")'
+RUN R -e 'devtools::install_github("google/CausalImpact")'
 
 RUN apt-get install python3-pandas -y
 

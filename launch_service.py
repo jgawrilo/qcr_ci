@@ -63,7 +63,7 @@ class ImpactPredictorAPI(Resource):
             logger.info("POST-END:" +str(args["data"]["post_end"]))
             logger.info("DATA:"+json.dumps(args["data"]["series"]))
 
-            treatment_control_data = treatment_control_data[["target","control"]]
+            treatment_control_data = treatment_control_data[["treatment","control"]]
 
             treatment_control_data.index = range(1,len(treatment_control_data)+1)
 
